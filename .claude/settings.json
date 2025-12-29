@@ -1,0 +1,46 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run dev --prefix frontend)",
+      "Bash(uvicorn backend.main:app --reload --port 8000)",
+      "Bash(npm run build --prefix frontend)",
+      "Bash(cd backend && python -m uvicorn main:app --reload --port 8000)",
+      "Read(specs/**/*.md)",
+      "Read(.claude/**/*.md)",
+      "Read(frontend/**/*.md)",
+      "Read(backend/**/*.md)"
+    ],
+    "deny": [
+      "Bash(rm -rf node_modules)",
+      "Bash(rm -rf .venv)",
+      "Bash(rm -rf frontend/node_modules)",
+      "Bash(rm -rf backend/venv)",
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./secrets/**)"
+    ],
+    "ask": [
+      "Bash(git push:*)",
+      "Bash(git commit:*)",
+      "Bash(npm run deploy --prefix frontend)",
+      "Bash(docker-compose down)"
+    ]
+  },
+  "env": {
+    "CLAUDE_CODE_ENABLE_TELEMETRY": "1"
+  },
+  "enabledSkills": [
+    "fastapi",
+    "nextjs",
+    "sqlmodel",
+    "better-auth",
+    "rest-api"
+  ],
+  "enabledSubagents": [
+    "backend-developer",
+    "frontend-developer",
+    "auth-specialist",
+    "database-specialist",
+    "api-developer"
+  ]
+}

@@ -1,0 +1,196 @@
+{
+  "version": "1.0.0",
+  "endpoints": [
+    {
+      "id": "auth-register",
+      "method": "POST",
+      "path": "/api/auth/register",
+      "description": "Register a new user",
+      "auth": false,
+      "request": {
+        "body": {
+          "email": "string",
+          "name": "string",
+          "password": "string"
+        }
+      },
+      "responses": {
+        "201": {
+          "token": "string",
+          "user": { "id": "string", "email": "string", "name": "string" }
+        },
+        "400": { "error": { "code": "string", "message": "string" } }
+      }
+    },
+    {
+      "id": "auth-login",
+      "method": "POST",
+      "path": "/api/auth/login",
+      "description": "Login and get JWT token",
+      "auth": false,
+      "request": {
+        "body": {
+          "email": "string",
+          "password": "string"
+        }
+      },
+      "responses": {
+        "200": {
+          "token": "string",
+          "user": { "id": "string", "email": "string", "name": "string" }
+        },
+        "401": { "error": { "code": "UNAUTHORIZED", "message": "Invalid credentials" } }
+      }
+    },
+    {
+      "id": "tasks-list",
+      "method": "GET",
+      "path": "/api/{user_id}/tasks",
+      "description": "List all tasks for a user",
+      "auth": true,
+      "parameters": {
+        "user_id": "string"
+      },
+      "responses": {
+        "200": {
+          "tasks": [
+            {
+              "id": "number",
+              "user_id": "string",
+              "title": "string",
+              "description": "string|null",
+              "completed": "boolean",
+              "created_at": "string",
+              "updated_at": "string"
+            }
+          ]
+        },
+        "401": { "error": { "code": "UNAUTHORIZED", "message": "Invalid token" } }
+      }
+    },
+    {
+      "id": "tasks-create",
+      "method": "POST",
+      "path": "/api/{user_id}/tasks",
+      "description": "Create a new task",
+      "auth": true,
+      "parameters": {
+        "user_id": "string"
+      },
+      "request": {
+        "body": {
+          "title": "string",
+          "description": "string|null"
+        }
+      },
+      "responses": {
+        "201": {
+          "task": {
+            "id": "number",
+            "user_id": "string",
+            "title": "string",
+            "description": "string|null",
+            "completed": "boolean",
+            "created_at": "string",
+            "updated_at": "string"
+          }
+        }
+      }
+    },
+    {
+      "id": "tasks-get",
+      "method": "GET",
+      "path": "/api/{user_id}/tasks/{task_id}",
+      "description": "Get a specific task",
+      "auth": true,
+      "parameters": {
+        "user_id": "string",
+        "task_id": "number"
+      },
+      "responses": {
+        "200": {
+          "task": {
+            "id": "number",
+            "user_id": "string",
+            "title": "string",
+            "description": "string|null",
+            "completed": "boolean",
+            "created_at": "string",
+            "updated_at": "string"
+          }
+        },
+        "404": { "error": { "code": "NOT_FOUND", "message": "Task not found" } }
+      }
+    },
+    {
+      "id": "tasks-update",
+      "method": "PUT",
+      "path": "/api/{user_id}/tasks/{task_id}",
+      "description": "Update a task",
+      "auth": true,
+      "parameters": {
+        "user_id": "string",
+        "task_id": "number"
+      },
+      "request": {
+        "body": {
+          "title": "string",
+          "description": "string|null",
+          "completed": "boolean"
+        }
+      },
+      "responses": {
+        "200": {
+          "task": {
+            "id": "number",
+            "user_id": "string",
+            "title": "string",
+            "description": "string|null",
+            "completed": "boolean",
+            "created_at": "string",
+            "updated_at": "string"
+          }
+        }
+      }
+    },
+    {
+      "id": "tasks-delete",
+      "method": "DELETE",
+      "path": "/api/{user_id}/tasks/{task_id}",
+      "description": "Delete a task",
+      "auth": true,
+      "parameters": {
+        "user_id": "string",
+        "task_id": "number"
+      },
+      "responses": {
+        "200": { "message": "Task deleted successfully" },
+        "404": { "error": { "code": "NOT_FOUND", "message": "Task not found" } }
+      }
+    },
+    {
+      "id": "tasks-toggle",
+      "method": "PATCH",
+      "path": "/api/{user_id}/tasks/{task_id}/complete",
+      "description": "Toggle task completion",
+      "auth": true,
+      "parameters": {
+        "user_id": "string",
+        "task_id": "number"
+      },
+      "responses": {
+        "200": {
+          "task": {
+            "id": "number",
+            "user_id": "string",
+            "title": "string",
+            "description": "string|null",
+            "completed": "boolean",
+            "created_at": "string",
+            "updated_at": "string"
+          }
+        }
+      }
+    }
+  ]
+}
