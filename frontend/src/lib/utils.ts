@@ -1,27 +1,27 @@
-import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
+import { clsx, type ClassValue } from "clsx"
+import { twMerge } from "tailwind-merge"
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
+  return twMerge(clsx(inputs))
 }
 
-export function formatDate(date: string | Date): string {
-  const d = new Date(date);
-  return d.toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  });
-}
+export function formatDate(dateString: string): string {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffTime = now.getTime() - date.getTime();
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
-export function formatTime(date: string | Date): string {
-  const d = new Date(date);
-  return d.toLocaleTimeString('en-US', {
-    hour: 'numeric',
-    minute: '2-digit',
-  });
-}
-
-export function formatDateTime(date: string | Date): string {
-  return `${formatDate(date)} at ${formatTime(date)}`;
+  if (diffDays === 0) {
+    return 'Today';
+  } else if (diffDays === 1) {
+    return 'Yesterday';
+  } else if (diffDays < 7) {
+    return `${diffDays} days ago`;
+  } else {
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined,
+    });
+  }
 }

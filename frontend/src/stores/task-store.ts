@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { toast } from 'sonner';
 import { api } from '@/lib/api';
 import type { Task, TaskCreate, TaskUpdate } from '@/lib/types';
+import { useAuthStore } from './auth-store';
 
 // Helper function to show error notifications using sonner
 const showErrorToast = (message: string) => {
@@ -29,12 +30,20 @@ interface TaskState {
   setError: (error: string | null) => void;
   clearTasks: () => void;
 
+  // Fetch Tasks
+  fetchTasks: () => Promise<void>;
+
   // Optimistic Actions (with API calls)
-  createTask: (userId: string, data: TaskCreate) => Promise<void>;
-  updateTask: (userId: string, taskId: number, data: TaskUpdate) => Promise<void>;
-  deleteTask: (userId: string, taskId: number) => Promise<void>;
-  toggleComplete: (userId: string, taskId: number) => Promise<void>;
+  createTask: (data: TaskCreate) => Promise<void>;
+  updateTask: (taskId: number, data: TaskUpdate) => Promise<void>;
+  deleteTask: (taskId: number) => Promise<void>;
+  toggleComplete: (taskId: number) => Promise<void>;
 }
+
+// Helper to get user ID
+const getUserId = (): string | null => {
+  return useAuthStore.getState().user?.id || null;
+};
 
 export const useTaskStore = create<TaskState>((set, get) => ({
   tasks: [],
@@ -58,8 +67,41 @@ export const useTaskStore = create<TaskState>((set, get) => ({
     set({ tasks: [], total: 0, error: null });
   },
 
+  // Fetch Tasks from API
+  fetchTasks: async () => {
+    const userId = getUserId();
+    if (!userId) {
+      set({ error: 'User not authenticated' });
+      return;
+    }
+
+    set({ isLoading: true, error: null });
+
+    try {
+      const response = await api.getTasks(userId);
+      set({
+        tasks: response.tasks,
+        total: response.total,
+        isLoading: false,
+      });
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch tasks';
+      set({
+        error: errorMessage,
+        isLoading: false,
+      });
+      showErrorToast(`Failed to load tasks: ${errorMessage}`);
+    }
+  },
+
   // Optimistic Create Task
-  createTask: async (userId: string, data: TaskCreate) => {
+  createTask: async (data: TaskCreate) => {
+    const userId = getUserId();
+    if (!userId) {
+      showErrorToast('User not authenticated');
+      return;
+    }
+
     // Create temporary task with optimistic ID (negative to avoid conflicts)
     const optimisticTask: Task = {
       id: -Date.now(), // Temporary negative ID
@@ -67,8 +109,10 @@ export const useTaskStore = create<TaskState>((set, get) => ({
       title: data.title,
       description: data.description,
       completed: false,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      priority: data.priority,
+      due_date: data.due_date,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
     };
 
     // Save previous state for rollback
@@ -109,7 +153,13 @@ export const useTaskStore = create<TaskState>((set, get) => ({
   },
 
   // Optimistic Update Task
-  updateTask: async (userId: string, taskId: number, data: TaskUpdate) => {
+  updateTask: async (taskId: number, data: TaskUpdate) => {
+    const userId = getUserId();
+    if (!userId) {
+      showErrorToast('User not authenticated');
+      return;
+    }
+
     // Prevent actions on tasks still being created (optimistic IDs)
     if (isOptimisticId(taskId)) {
       toast.info('Please wait, task is still being saved...');
@@ -130,7 +180,7 @@ export const useTaskStore = create<TaskState>((set, get) => ({
     set((state) => ({
       tasks: state.tasks.map((t) =>
         t.id === taskId
-          ? { ...t, ...data, updatedAt: new Date().toISOString() }
+          ? { ...t, ...data, updated_at: new Date().toISOString() }
           : t
       ),
       error: null,
@@ -160,7 +210,13 @@ export const useTaskStore = create<TaskState>((set, get) => ({
   },
 
   // Optimistic Delete Task
-  deleteTask: async (userId: string, taskId: number) => {
+  deleteTask: async (taskId: number) => {
+    const userId = getUserId();
+    if (!userId) {
+      showErrorToast('User not authenticated');
+      return;
+    }
+
     // Prevent actions on tasks still being created (optimistic IDs)
     if (isOptimisticId(taskId)) {
       toast.info('Please wait, task is still being saved...');
@@ -204,7 +260,13 @@ export const useTaskStore = create<TaskState>((set, get) => ({
   },
 
   // Optimistic Toggle Complete
-  toggleComplete: async (userId: string, taskId: number) => {
+  toggleComplete: async (taskId: number) => {
+    const userId = getUserId();
+    if (!userId) {
+      showErrorToast('User not authenticated');
+      return;
+    }
+
     // Prevent actions on tasks still being created (optimistic IDs)
     if (isOptimisticId(taskId)) {
       toast.info('Please wait, task is still being saved...');
@@ -228,7 +290,7 @@ export const useTaskStore = create<TaskState>((set, get) => ({
           ? {
               ...t,
               completed: !t.completed,
-              updatedAt: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
             }
           : t
       ),

@@ -32,7 +32,7 @@ export function TaskList() {
         const completed = filter === 'active' ? false : filter === 'completed' ? true : undefined;
         const data = await api.getTasks(user.id, completed);
         setTasks(data.tasks, data.total);
-      } catch (err) {
+      } catch {
         setError('Failed to load tasks');
         setStoreError('Failed to load tasks');
       } finally {

@@ -7,7 +7,6 @@ import { authClient } from '@/lib/auth-client';
 import { clearJwtToken } from '@/lib/auth-client';
 import { useAuthStore } from '@/stores/auth-store';
 import { useUIStore } from '@/stores/ui-store';
-import { cn } from '@/lib/utils';
 
 export function Header() {
   const router = useRouter();

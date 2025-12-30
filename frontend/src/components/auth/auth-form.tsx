@@ -78,6 +78,8 @@ export function AuthForm({ mode }: AuthFormProps) {
             id: user.id,
             email: user.email,
             name: user.name || '',
+            image: user.image || null,
+            created_at: user.createdAt?.toString() || null,
           },
           token
         );
@@ -85,7 +87,7 @@ export function AuthForm({ mode }: AuthFormProps) {
 
       // Step 4: Navigate to dashboard
       await new Promise(resolve => setTimeout(resolve, 100));
-      router.push('/');
+      router.push('/dashboard');
     } catch (err) {
       // Show detailed error for debugging
       console.error('Better Auth login error:', err);

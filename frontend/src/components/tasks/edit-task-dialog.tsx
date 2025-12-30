@@ -37,7 +37,7 @@ export function EditTaskDialog({ task, open, onOpenChange }: EditTaskDialogProps
 
     setIsLoading(true);
     try {
-      await updateTask(user.id, task.id, {
+      await updateTask(task.id, {
         title: title.trim(),
         description: description.trim() || undefined,
       });

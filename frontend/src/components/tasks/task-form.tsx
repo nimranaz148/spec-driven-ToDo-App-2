@@ -43,10 +43,10 @@ export function TaskForm({ onSuccess, onError }: TaskFormProps) {
     setIsLoading(true);
     try {
       // Use optimistic update from store
-      await createTask(user.id, data);
+      await createTask(data);
       reset();
       onSuccess?.();
-    } catch (error) {
+    } catch {
       onError?.('Failed to create task');
     } finally {
       setIsLoading(false);

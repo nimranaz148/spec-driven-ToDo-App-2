@@ -17,7 +17,7 @@ export async function generateAndStoreJwtToken(): Promise<string | null> {
   try {
     // Primary method: authClient.token()
     console.log('[JWT] Trying authClient.token()...');
-    const response = await (authClient as any).token();
+    const response = await (authClient as unknown as { token: () => Promise<{ error?: unknown; data?: { token: string } }> }).token();
     console.log('[JWT] authClient.token() response:', JSON.stringify(response, null, 2));
 
     if (!response.error && response.data?.token) {

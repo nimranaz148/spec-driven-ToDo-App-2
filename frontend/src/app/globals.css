@@ -1,26 +1,380 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+
+  /* Custom Luxury Colors */
+  --color-gold: var(--gold);
+  --color-gold-dark: var(--gold-dark);
+  --color-cream: var(--cream);
+  --color-success: var(--success);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* Luxury Cream Theme - Light Mode */
+:root {
+  --radius: 0.625rem;
+
+  /* Cream Background */
+  --background: #f8f5f0;
+  --foreground: #1a1a1a;
+
+  /* Gold Accent Colors */
+  --gold: #c9a962;
+  --gold-dark: #a08339;
+  --cream: #f8f5f0;
+  --success: #2d5a27;
+
+  /* Card & Popover */
+  --card: #ffffff;
+  --card-foreground: #1a1a1a;
+  --popover: #ffffff;
+  --popover-foreground: #1a1a1a;
+
+  /* Primary - Gold */
+  --primary: #c9a962;
+  --primary-foreground: #1a1a1a;
+
+  /* Secondary */
+  --secondary: #f0ebe3;
+  --secondary-foreground: #1a1a1a;
+
+  /* Muted */
+  --muted: #e8e3db;
+  --muted-foreground: #6b6b6b;
+
+  /* Accent */
+  --accent: #f0ebe3;
+  --accent-foreground: #1a1a1a;
+
+  /* Destructive - Red */
+  --destructive: #8b2635;
+
+  /* Border & Input */
+  --border: #e0d8cc;
+  --input: #e0d8cc;
+  --ring: #c9a962;
+
+  /* Charts */
+  --chart-1: #c9a962;
+  --chart-2: #2d5a27;
+  --chart-3: #8b2635;
+  --chart-4: #a08339;
+  --chart-5: #6b6b6b;
+
+  /* Sidebar */
+  --sidebar: #ffffff;
+  --sidebar-foreground: #1a1a1a;
+  --sidebar-primary: #c9a962;
+  --sidebar-primary-foreground: #1a1a1a;
+  --sidebar-accent: #f0ebe3;
+  --sidebar-accent-foreground: #1a1a1a;
+  --sidebar-border: #e0d8cc;
+  --sidebar-ring: #c9a962;
+}
+
+/* Dark Mode */
+.dark {
+  --background: #1a1a1a;
+  --foreground: #f8f5f0;
+
+  --gold: #c9a962;
+  --gold-dark: #d4b876;
+  --cream: #2d2d2d;
+  --success: #4ade80;
+
+  --card: #262626;
+  --card-foreground: #f8f5f0;
+  --popover: #262626;
+  --popover-foreground: #f8f5f0;
+
+  --primary: #c9a962;
+  --primary-foreground: #1a1a1a;
+
+  --secondary: #333333;
+  --secondary-foreground: #f8f5f0;
+
+  --muted: #333333;
+  --muted-foreground: #a3a3a3;
+
+  --accent: #333333;
+  --accent-foreground: #f8f5f0;
+
+  --destructive: #dc2626;
+
+  --border: #404040;
+  --input: #404040;
+  --ring: #c9a962;
+
+  --chart-1: #c9a962;
+  --chart-2: #4ade80;
+  --chart-3: #f87171;
+  --chart-4: #d4b876;
+  --chart-5: #a3a3a3;
+
+  --sidebar: #262626;
+  --sidebar-foreground: #f8f5f0;
+  --sidebar-primary: #c9a962;
+  --sidebar-primary-foreground: #1a1a1a;
+  --sidebar-accent: #333333;
+  --sidebar-accent-foreground: #f8f5f0;
+  --sidebar-border: #404040;
+  --sidebar-ring: #c9a962;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Custom Animations */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes pulse-gold {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(201, 169, 98, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 15px rgba(201, 169, 98, 0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes gradient-x {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes bounce-subtle {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+/* Utility Classes */
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out forwards;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.6s ease-out forwards;
+}
+
+.animate-slide-down {
+  animation: slide-down 0.6s ease-out forwards;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.3s ease-out forwards;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-pulse-gold {
+  animation: pulse-gold 2s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(201, 169, 98, 0.3) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+.animate-gradient-x {
+  background-size: 200% 200%;
+  animation: gradient-x 3s ease infinite;
+}
+
+.animate-bounce-subtle {
+  animation: bounce-subtle 2s ease-in-out infinite;
+}
+
+/* Delay Utilities */
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-400 { animation-delay: 400ms; }
+.delay-500 { animation-delay: 500ms; }
+.delay-600 { animation-delay: 600ms; }
+.delay-700 { animation-delay: 700ms; }
+.delay-800 { animation-delay: 800ms; }
+
+/* Gold Gradient Text */
+.text-gradient-gold {
+  background: linear-gradient(135deg, #c9a962 0%, #d4b876 50%, #a08339 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Gold Button Glow */
+.gold-glow {
+  box-shadow: 0 0 20px rgba(201, 169, 98, 0.3);
+}
+
+.gold-glow:hover {
+  box-shadow: 0 0 30px rgba(201, 169, 98, 0.5);
+}
+
+/* Glass Effect */
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.dark .glass {
+  background: rgba(38, 38, 38, 0.7);
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--muted);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--gold);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gold-dark);
+}
+
+/* Focus Ring */
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 focus:ring-offset-background;
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

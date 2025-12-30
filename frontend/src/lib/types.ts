@@ -5,6 +5,7 @@ export interface User {
   id: string;
   email: string;
   name: string;
+  image?: string | null;
   created_at: string | null;
 }
 
@@ -14,19 +15,25 @@ export interface Task {
   title: string;
   description?: string;
   completed: boolean;
-  createdAt: string;
-  updatedAt: string;
+  priority?: 'low' | 'medium' | 'high';
+  due_date?: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface TaskCreate {
   title: string;
   description?: string;
+  priority?: 'low' | 'medium' | 'high';
+  due_date?: string;
 }
 
 export interface TaskUpdate {
   title?: string;
   description?: string;
   completed?: boolean;
+  priority?: 'low' | 'medium' | 'high';
+  due_date?: string;
 }
 
 export interface TaskListResponse {

@@ -26,7 +26,7 @@ export function TaskItem({ task }: TaskItemProps) {
     setIsLoading(true);
     try {
       // Use optimistic update from store
-      await toggleComplete(user.id, task.id);
+      await toggleComplete(task.id);
     } catch (error) {
       console.error('Failed to toggle task:', error);
     } finally {
@@ -40,7 +40,7 @@ export function TaskItem({ task }: TaskItemProps) {
     setIsLoading(true);
     try {
       // Use optimistic update from store
-      await deleteTask(user.id, task.id);
+      await deleteTask(task.id);
     } catch (error) {
       console.error('Failed to delete task:', error);
     } finally {
@@ -105,8 +105,8 @@ export function TaskItem({ task }: TaskItemProps) {
                 {task.description}
               </motion.p>
             )}
-            <p className="text-xs text-muted-foreground mt-2" aria-label={`Created on ${formatDate(task.createdAt)}`}>
-              Created {formatDate(task.createdAt)}
+            <p className="text-xs text-muted-foreground mt-2" aria-label={`Created on ${formatDate(task.created_at)}`}>
+              Created {formatDate(task.created_at)}
             </p>
           </div>
 
