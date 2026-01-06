@@ -57,3 +57,46 @@ export interface RegisterRequest {
   name: string;
   password: string;
 }
+
+// Chat-related types (Phase 3)
+export interface ChatMessage {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
+export interface ChatRequest {
+  conversation_id?: number | null;
+  message: string;
+  confirm_token?: string;
+}
+
+export interface ToolCall {
+  tool: string;
+  parameters: Record<string, unknown>;
+  result: { success: boolean; id?: number; message?: string; [key: string]: unknown };
+  duration_ms?: number;
+}
+
+export type ThinkingStepType = 'analyzing' | 'planning' | 'tool_call' | 'processing' | 'clarifying';
+
+export interface ThinkingStep {
+  type: ThinkingStepType;
+  content: string;
+  timestamp?: number;
+}
+
+export interface ConfirmationRequest {
+  action: string;
+  message: string;
+  affected_items: Array<{ id: number; title: string }>;
+  confirm_token: string;
+}
+
+export interface ChatResponse {
+  conversation_id: number;
+  response: string;
+  tool_calls?: ToolCall[];
+  thinking_steps?: ThinkingStep[];
+  confirmation_required?: ConfirmationRequest;
+  processing_time_ms?: number;
+}

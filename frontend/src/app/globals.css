@@ -57,7 +57,7 @@
   --radius: 0.625rem;
 
   /* Cream Background */
-  --background: #f8f5f0;
+  --background: #ffffff;
   --foreground: #1a1a1a;
 
   /* Gold Accent Colors */
@@ -116,7 +116,7 @@
 
 /* Dark Mode */
 .dark {
-  --background: #1a1a1a;
+  --background: #000000;
   --foreground: #f8f5f0;
 
   --gold: #c9a962;

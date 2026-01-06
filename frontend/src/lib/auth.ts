@@ -1,5 +1,6 @@
 import { betterAuth } from 'better-auth';
 import { bearer, jwt } from 'better-auth/plugins';
+import { nextCookies } from 'better-auth/next-js';
 import pg from 'pg';
 
 // Better Auth server configuration
@@ -12,13 +13,31 @@ import pg from 'pg';
 // Create PostgreSQL connection pool for Better Auth
 const databaseUrl = process.env.DATABASE_URL || '';
 
+// Log database connection attempt (only once at startup)
+if (typeof process !== 'undefined' && databaseUrl) {
+  console.log('[Better Auth] Connecting to database:', databaseUrl.substring(0, 40) + '...');
+}
+
 const pool = new pg.Pool({
   connectionString: databaseUrl,
   ssl: {
     rejectUnauthorized: false,
   },
-  connectionTimeoutMillis: 30000,
+  connectionTimeoutMillis: 60000,  // 60s for Neon cold starts
   idleTimeoutMillis: 30000,
+  max: 3,
+  min: 1,                          // Keep 1 connection warm
+  keepAlive: true,
+  keepAliveInitialDelayMillis: 1000,
+});
+
+// Handle pool errors gracefully
+pool.on('error', (err) => {
+  console.error('[Better Auth] Pool error:', err.message);
+});
+
+pool.on('connect', () => {
+  console.log('[Better Auth] Database connected');
 });
 
 export const auth = betterAuth({
@@ -47,7 +66,7 @@ export const auth = betterAuth({
     disableMigrations: false,
   },
 
-  // CRITICAL PLUGINS:
+  // CRITICAL PLUGINS (nextCookies must be LAST):
   plugins: [
     bearer(),      // Enables Bearer token auth
     jwt({          // Enables JWT token generation
@@ -55,6 +74,7 @@ export const auth = betterAuth({
         expirationTime: "7d",
       },
     }),
+    nextCookies(), // MUST be last - handles Next.js cookie management
   ],
 
   secret: process.env.BETTER_AUTH_SECRET!,

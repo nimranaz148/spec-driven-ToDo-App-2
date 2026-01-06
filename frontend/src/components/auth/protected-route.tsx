@@ -3,24 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/auth-store';
+import { syncTokenCookie, getJwtToken } from '@/lib/auth-client';
 
-/**
- * ProtectedRoute component - Middleware for protecting routes that require authentication
- *
- * This component checks if the user is authenticated by verifying the presence of a JWT token
- * in the Zustand auth store. If not authenticated, it redirects to the login page.
- *
- * @example
- * ```tsx
- * export default function DashboardPage() {
- *   return (
- *     <ProtectedRoute>
- *       <div>Protected content here</div>
- *     </ProtectedRoute>
- *   );
- * }
- * ```
- */
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
@@ -28,36 +12,38 @@ interface ProtectedRouteProps {
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const router = useRouter();
   const { isAuthenticated, token } = useAuthStore();
-  const [isChecking, setIsChecking] = useState(true);
+  const [hasHydrated, setHasHydrated] = useState(false);
 
   useEffect(() => {
-    // Check authentication status
-    const checkAuth = () => {
-      // If not authenticated or no token, redirect to login
-      if (!isAuthenticated || !token) {
-        router.push('/login');
-        return;
-      }
+    // Wait for zustand to hydrate from localStorage
+    setHasHydrated(true);
+    // Sync token cookie for Edge runtime
+    syncTokenCookie();
+  }, []);
 
-      // Authentication check complete
-      setIsChecking(false);
-    };
+  useEffect(() => {
+    if (!hasHydrated) return;
 
-    checkAuth();
-  }, [isAuthenticated, token, router]);
+    // Check localStorage directly as backup
+    const storedToken = getJwtToken();
+    
+    // Only redirect if truly not authenticated
+    if (!isAuthenticated && !token && !storedToken) {
+      console.log('[ProtectedRoute] No auth, redirecting to login');
+      router.push('/login');
+    }
+  }, [hasHydrated, isAuthenticated, token, router]);
 
-  // Show loading state while checking authentication
-  if (isChecking) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="flex flex-col items-center gap-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-          <p className="text-sm text-muted-foreground">Loading...</p>
-        </div>
-      </div>
-    );
+  // Show nothing while hydrating
+  if (!hasHydrated) {
+    return null;
   }
 
-  // If authenticated, render the protected content
+  // Check localStorage as backup
+  const storedToken = getJwtToken();
+  if (!isAuthenticated && !token && !storedToken) {
+    return null;
+  }
+
   return <>{children}</>;
 }

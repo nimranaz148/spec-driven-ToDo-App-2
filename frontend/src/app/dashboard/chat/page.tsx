@@ -1,203 +1,233 @@
 'use client';
 
-import { useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import {
-  MessageSquare,
-  Send,
-  Sparkles,
-  Bot,
-  User,
-  Loader2,
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { useEffect, useState } from 'react';
+import { MessageSquare, Zap } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth-store';
-
-interface Message {
-  id: string;
-  role: 'user' | 'assistant';
-  content: string;
-  timestamp: Date;
-}
+import { useChatStore } from '@/stores/chat-store';
+import { ChatKitUI, type ChatMessage } from '@/components/chat/chatkit-ui';
+import ConversationSidebar from '@/components/chat/conversation-sidebar';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 const suggestedPrompts = [
-  'Show me my high priority tasks',
-  'What tasks are due today?',
-  'Summarize my productivity this week',
-  'Help me prioritize my tasks',
+  'Add a task to buy groceries',
+  'Show me my pending tasks',
+  'Mark task 1 as complete',
+  'What tasks do I have?',
 ];
 
 export default function ChatPage() {
   const { user } = useAuthStore();
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [useStreaming, setUseStreaming] = useState(true);
+  const {
+    messages,
+    conversations,
+    activeConversationId,
+    isLoading,
+    isStreaming,
+    error,
+    isHistoryLoaded,
+    pendingConfirmation,
+    fetchConversations,
+    createConversation,
+    deleteConversation,
+    renameConversation,
+    switchConversation,
+    fetchHistory,
+    sendMessage,
+    sendMessageStreaming,
+    confirmAction,
+    cancelConfirmation,
+  } = useChatStore();
 
-  const handleSend = async () => {
-    if (!input.trim() || isLoading) return;
+  // Initialize conversations and active conversation on mount
+  useEffect(() => {
+    if (user) {
+      console.log('[Chat Page] User found:', user);
+      console.log('[Chat Page] Fetching conversations...');
+      fetchConversations().then(() => {
+        const state = useChatStore.getState();
+        if (state.conversations.length > 0 && !state.activeConversationId) {
+          // Set the first conversation as active
+          switchConversation(state.conversations[0].id);
+        }
+      }).catch((error) => {
+        console.error('[Chat Page] Failed to fetch conversations:', error);
+      });
+    } else {
+      console.log('[Chat Page] No user found - user needs to login');
+    }
+  }, [user, fetchConversations, switchConversation]);
 
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      role: 'user',
-      content: input.trim(),
-      timestamp: new Date(),
-    };
+  // Fetch history when active conversation changes
+  useEffect(() => {
+    if (activeConversationId && !isHistoryLoaded) {
+      fetchHistory(activeConversationId);
+    }
+  }, [activeConversationId, isHistoryLoaded, fetchHistory]);
 
-    setMessages((prev) => [...prev, userMessage]);
-    setInput('');
-    setIsLoading(true);
+  // Convert store messages to ChatKit format
+  const chatMessages: ChatMessage[] = messages.map((msg) => ({
+    id: msg.id,
+    role: msg.role,
+    content: msg.content,
+    timestamp: msg.timestamp,
+    isOptimistic: msg.isOptimistic,
+    isStreaming: msg.isStreaming,
+    thinkingSteps: msg.thinkingSteps,
+    toolCalls: msg.toolCalls,
+    processingTimeMs: msg.processingTimeMs,
+  }));
 
-    // Simulate AI response
-    setTimeout(() => {
-      const aiMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: `I understand you want to "${userMessage.content}". This is a placeholder response. In a full implementation, I would connect to an AI backend to help you manage your tasks, provide insights, and answer your questions about productivity.`,
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, aiMessage]);
-      setIsLoading(false);
-    }, 1500);
+  const handleSendMessage = async (content: string) => {
+    try {
+      console.log('[Chat] Sending message:', content);
+      console.log('[Chat] Active conversation ID:', activeConversationId);
+      
+      // Create a new conversation if none is active
+      if (!activeConversationId) {
+        console.log('[Chat] No active conversation, creating new one...');
+        const newConversationId = await createConversation();
+        console.log('[Chat] Created conversation:', newConversationId);
+        // The store will automatically switch to the new conversation
+      }
+
+      if (useStreaming) {
+        console.log('[Chat] Using streaming...');
+        await sendMessageStreaming(content);
+      } else {
+        console.log('[Chat] Using regular send...');
+        await sendMessage(content);
+      }
+      console.log('[Chat] Message sent successfully');
+    } catch (error) {
+      console.error('[Chat] Failed to send message:', error);
+      toast.error('Failed to send message');
+    }
   };
 
-  const handleSuggestedPrompt = (prompt: string) => {
-    setInput(prompt);
+  const handleCreateConversation = async () => {
+    try {
+      console.log('[Chat] Creating new conversation...');
+      const newConversationId = await createConversation();
+      console.log('[Chat] New conversation created:', newConversationId);
+      toast.success('New conversation created');
+    } catch (error) {
+      console.error('[Chat] Failed to create conversation:', error);
+      toast.error('Failed to create conversation');
+    }
+  };
+
+  const handleDeleteConversation = async (id: number) => {
+    try {
+      await deleteConversation(id);
+    } catch (error) {
+      // Error is handled by the store
+    }
+  };
+
+  const handleRenameConversation = async (id: number, title: string) => {
+    try {
+      await renameConversation(id, title);
+    } catch (error) {
+      // Error is handled by the store
+    }
   };
 
   return (
-    <div className="h-[calc(100vh-10rem)] flex flex-col max-w-4xl mx-auto">
-      {/* Header */}
-      <div className="mb-6">
-        <div className="flex items-center gap-3 mb-2">
-          <MessageSquare className="h-8 w-8 text-primary" />
-          <h1 className="text-2xl sm:text-3xl font-bold">AI Chat</h1>
-        </div>
-        <p className="text-muted-foreground">
-          Ask me anything about your tasks and productivity
-        </p>
-      </div>
+    <div className="h-[calc(100vh-4rem)] flex">
+      {/* Conversation Sidebar */}
+      <ConversationSidebar
+        conversations={conversations}
+        activeConversationId={activeConversationId}
+        onSelectConversation={switchConversation}
+        onCreateConversation={handleCreateConversation}
+        onDeleteConversation={handleDeleteConversation}
+        onRenameConversation={handleRenameConversation}
+        isLoading={isLoading}
+      />
 
-      {/* Chat Area */}
-      <Card className="flex-1 border-border/50 flex flex-col overflow-hidden">
-        <ScrollArea className="flex-1 p-4">
-          {messages.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center text-center p-8">
-              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                <Sparkles className="h-8 w-8 text-primary" />
-              </div>
-              <h3 className="text-lg font-semibold mb-2">
-                Hi, {user?.name || 'there'}! How can I help?
-              </h3>
-              <p className="text-muted-foreground mb-6 max-w-md">
-                I&apos;m your AI assistant. Ask me about your tasks, get productivity
-                insights, or let me help you organize your day.
-              </p>
-              <div className="flex flex-wrap gap-2 justify-center">
-                {suggestedPrompts.map((prompt) => (
-                  <Button
-                    key={prompt}
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleSuggestedPrompt(prompt)}
-                    className="text-sm"
-                  >
-                    {prompt}
-                  </Button>
-                ))}
+      {/* Main Chat Area */}
+      <div className="flex-1 flex flex-col max-w-4xl mx-auto">
+        {/* Header */}
+        <div className="p-6 border-b border-border">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <MessageSquare className="h-8 w-8 text-primary" />
+              <div>
+                <h1 className="text-2xl sm:text-3xl font-bold">AI Chat</h1>
+                {activeConversationId && (
+                  <p className="text-sm text-muted-foreground">
+                    {conversations.find(c => c.id === activeConversationId)?.title || 'Untitled Chat'}
+                  </p>
+                )}
               </div>
             </div>
-          ) : (
-            <div className="space-y-4">
-              {messages.map((message) => (
-                <div
-                  key={message.id}
-                  className={cn(
-                    'flex gap-3',
-                    message.role === 'user' && 'flex-row-reverse'
-                  )}
-                >
-                  <Avatar className="h-8 w-8 shrink-0">
-                    <AvatarFallback
-                      className={cn(
-                        message.role === 'assistant'
-                          ? 'bg-primary/10 text-primary'
-                          : 'bg-secondary'
-                      )}
-                    >
-                      {message.role === 'assistant' ? (
-                        <Bot className="h-4 w-4" />
-                      ) : (
-                        <User className="h-4 w-4" />
-                      )}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div
-                    className={cn(
-                      'rounded-lg p-3 max-w-[80%]',
-                      message.role === 'assistant'
-                        ? 'bg-muted'
-                        : 'bg-primary text-primary-foreground'
-                    )}
-                  >
-                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                    <p
-                      className={cn(
-                        'text-xs mt-1',
-                        message.role === 'assistant'
-                          ? 'text-muted-foreground'
-                          : 'text-primary-foreground/70'
-                      )}
-                    >
-                      {message.timestamp.toLocaleTimeString([], {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
-                    </p>
-                  </div>
-                </div>
-              ))}
-              {isLoading && (
-                <div className="flex gap-3">
-                  <Avatar className="h-8 w-8 shrink-0">
-                    <AvatarFallback className="bg-primary/10 text-primary">
-                      <Bot className="h-4 w-4" />
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="rounded-lg p-3 bg-muted">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  </div>
-                </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setUseStreaming(!useStreaming)}
+              className={cn(
+                'gap-2 transition-colors',
+                useStreaming && 'bg-primary/10 border-primary/50 text-primary'
               )}
+            >
+              <Zap className={cn('h-4 w-4', useStreaming && 'text-primary')} />
+              {useStreaming ? 'Streaming' : 'Standard'}
+            </Button>
+          </div>
+          <p className="text-muted-foreground mt-2">
+            Manage your tasks using natural language
+          </p>
+        </div>
+
+        {/* Chat Interface */}
+        <div className="flex-1 min-h-0">
+          {activeConversationId ? (
+            <ChatKitUI
+              messages={chatMessages}
+              isLoading={isLoading}
+              isTyping={(isLoading || isStreaming) && messages.length > 0 && !messages[messages.length - 1]?.isStreaming}
+              error={error}
+              pendingConfirmation={pendingConfirmation}
+              assistantName="Task Assistant"
+              onSendMessage={handleSendMessage}
+              onConfirm={confirmAction}
+              onCancel={cancelConfirmation}
+              placeholder="Ask me to manage your tasks..."
+              suggestedPrompts={suggestedPrompts}
+            />
+          ) : (
+            <div className="flex-1 flex items-center justify-center">
+              <div className="text-center">
+                <MessageSquare className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
+                {!user ? (
+                  <>
+                    <h3 className="text-lg font-medium mb-2">Please log in</h3>
+                    <p className="text-muted-foreground mb-4">
+                      You need to be logged in to use the chat feature
+                    </p>
+                    <Button onClick={() => window.location.href = '/login'}>
+                      Go to Login
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <h3 className="text-lg font-medium mb-2">No conversation selected</h3>
+                    <p className="text-muted-foreground mb-4">
+                      Create a new conversation to start chatting with your AI assistant
+                    </p>
+                    <Button onClick={handleCreateConversation}>
+                      Start New Chat
+                    </Button>
+                  </>
+                )}
+              </div>
             </div>
           )}
-        </ScrollArea>
-
-        {/* Input Area */}
-        <CardContent className="p-4 border-t border-border">
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              handleSend();
-            }}
-            className="flex gap-2"
-          >
-            <Input
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask me anything..."
-              disabled={isLoading}
-              className="flex-1"
-            />
-            <Button type="submit" disabled={!input.trim() || isLoading}>
-              <Send className="h-4 w-4" />
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }

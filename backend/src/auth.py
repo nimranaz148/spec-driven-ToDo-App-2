@@ -152,3 +152,48 @@ class AuthContext:
 def create_auth_context(user_id: str, email: str) -> AuthContext:
     """Create an auth context object."""
     return AuthContext(user_id=user_id, email=email)
+
+
+def verify_user_access(path_user_id: str, current_user: dict) -> None:
+    """Verify that the path user_id matches the authenticated user.
+
+    This is a shared guard used by both task and chat routes to enforce
+    user isolation (SC-004).
+
+    Args:
+        path_user_id: The user_id from the URL path
+        current_user: The authenticated user dict from get_current_user
+
+    Raises:
+        HTTPException: 403 if user_id doesn't match
+    """
+    if path_user_id != current_user["user_id"]:
+        logger.warning(
+            "access_denied",
+            path_user_id=path_user_id,
+            auth_user_id=current_user["user_id"],
+            reason="User ID mismatch",
+        )
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied: You can only access your own resources",
+        )
+
+
+async def get_verified_user(
+    user_id: str,
+    current_user: dict = Depends(get_current_user),
+) -> dict:
+    """Dependency that verifies user_id matches authenticated user.
+
+    Usage:
+        @router.post("/api/{user_id}/chat")
+        async def chat(verified_user: dict = Depends(get_verified_user)):
+            # verified_user is guaranteed to match path user_id
+            pass
+
+    Note: This depends on the path parameter being named 'user_id'.
+    For routes using this, FastAPI will extract user_id from path automatically.
+    """
+    verify_user_access(user_id, current_user)
+    return current_user

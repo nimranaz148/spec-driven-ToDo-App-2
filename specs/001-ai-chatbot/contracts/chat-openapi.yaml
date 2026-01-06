@@ -1,0 +1,107 @@
+openapi: 3.1.0
+info:
+  title: Todo AI Chatbot API
+  version: 0.1.0
+  description: Chat endpoint for AI-powered todo assistant (Phase 3)
+servers:
+  - url: https://{host}
+    variables:
+      host:
+        default: localhost:8000
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    ChatMessage:
+      type: object
+      required: [role, content]
+      properties:
+        role:
+          type: string
+          enum: [user, assistant]
+        content:
+          type: string
+          minLength: 1
+          maxLength: 4000
+    ChatRequest:
+      type: object
+      required: [message]
+      properties:
+        conversation_id:
+          type: integer
+          nullable: true
+        message:
+          type: string
+          minLength: 1
+          maxLength: 4000
+    ToolCall:
+      type: object
+      required: [tool, parameters, result]
+      properties:
+        tool:
+          type: string
+        parameters:
+          type: object
+          additionalProperties: true
+        result:
+          type: object
+          additionalProperties: true
+    ChatResponse:
+      type: object
+      required: [conversation_id, response]
+      properties:
+        conversation_id:
+          type: integer
+        response:
+          type: string
+        tool_calls:
+          type: array
+          items:
+            $ref: '#/components/schemas/ToolCall'
+
+security:
+  - bearerAuth: []
+
+paths:
+  /api/{user_id}/chat:
+    post:
+      summary: Send a chat message and receive assistant response
+      operationId: sendChatMessage
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatRequest'
+      responses:
+        '200':
+          description: Successful assistant response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatResponse'
+        '400':
+          description: Validation error (e.g., empty message, too long)
+        '401':
+          description: Missing or invalid JWT
+        '403':
+          description: user_id does not match token subject
+        '404':
+          description: Conversation not found (if ID provided and invalid)
+        '429':
+          description: Rate limit exceeded (optional)
+        '500':
+          description: Agent execution failed
