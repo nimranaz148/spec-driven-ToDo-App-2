@@ -446,8 +446,8 @@ export function ChatKitUI({
   };
 
   const handlePromptSelect = (prompt: string) => {
-    setInput(prompt);
-    inputRef.current?.focus();
+    onSendMessage(prompt);
+    setInput('');
   };
 
   return (

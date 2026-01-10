@@ -17,6 +17,7 @@
     "test:e2e:install": "playwright install --with-deps"
   },
   "dependencies": {
+    "@openai/chatkit-react": "^1.4.0",
     "@hookform/resolvers": "^5.2.2",
     "@neondatabase/serverless": "^1.0.2",
     "@radix-ui/react-avatar": "^1.1.11",

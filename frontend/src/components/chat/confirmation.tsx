@@ -1,4 +1,4 @@
-"""Confirmation modal component for bulk chat operations."""
+// Confirmation modal component for bulk chat operations
 
 import React from 'react'
 import {
@@ -131,7 +131,7 @@ export default function ConfirmationModal({
             Cancel
           </Button>
           <Button
-            variant={getActionColor() as any}
+            variant={getActionColor() as 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link'}
             onClick={handleConfirm}
             disabled={isLoading}
             className="w-full sm:w-auto"

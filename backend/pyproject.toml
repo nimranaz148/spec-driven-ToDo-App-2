@@ -26,6 +26,8 @@ dependencies = [
     "openai-agents>=0.6.0",
     "mcp>=1.0.0",
     "fastmcp>=2.0.0,<3",
+    # ChatKit Python SDK for chat UI integration
+    "openai-chatkit>=1.5.0",
     # Database drivers for MCP server (sync)
     "psycopg2-binary>=2.9.0",
 ]

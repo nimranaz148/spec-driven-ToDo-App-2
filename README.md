@@ -10,18 +10,44 @@ Transform the Phase 2 web application into an AI-powered chatbot interface with 
 
 ### Phase 3 Features
 
-- **AI Chatbot Interface** - Natural language task management through conversation with **ChatKit integration**
+- **AI Chatbot Interface** - Natural language task management through conversation with **dual UI options**
 - **OpenAI Agents SDK** - Gemini 2.5 Flash-powered AI assistant
 - **MCP Server** - FastMCP with 5 task operation tools (add, list, complete, delete, update)
 - **SSE Streaming** - Real-time response streaming with token-by-token display
 - **Conversation History** - Persistent chat storage with sidebar navigation and conversation switching
-- **ChatKit UI** - Production-ready chat interface from OpenAI with theming support
+- **Dual Chat UI Options**:
+  - **ChatKit UI** - Production-ready chat interface from OpenAI with theming support
+  - **Custom UI** - Enhanced custom chat interface with advanced streaming visualization
+- **UI Toggle** - Switch between ChatKit and Custom UI seamlessly during conversations
 - **Analytics Dashboard** - Interactive charts with Recharts (Productivity Trend, Task Distribution, Status Overview)
 - **Loading Indicators** - Visual feedback during AI processing
 - **Auto-scroll** - Automatic scrolling to new messages
 - **Keyboard Shortcuts** - Enter to send, Shift+Enter for newline
-- **Error Handling** - Graceful error messages with duplicate response prevention
+- **Error Handling** - Graceful error messages with rate limit detection and user-friendly notifications
 - **Security** - Rate limiting, input sanitization, and prompt injection protection
+
+### Chat Interface Options
+
+Users can choose between two chat interfaces, each with unique advantages:
+
+#### **ChatKit UI** (Default)
+- Professional OpenAI ChatKit interface
+- Clean, minimalist design
+- Standard chat experience
+- Built-in theming support
+- Quick message sending
+
+#### **Custom UI**
+- Enhanced streaming visualization
+- Real-time thinking steps display
+- Tool call progress indicators
+- Rich markdown rendering with syntax highlighting
+- Conversation history with timestamps
+- Processing time metrics
+- Advanced error handling with actionable feedback
+- Better context for rate limit errors
+
+**Switch Between UIs**: Use the toggle button at the top of the chat page to switch between ChatKit and Custom interfaces at any time.
 
 ### Hybrid Voice + AI Chat Interface
 

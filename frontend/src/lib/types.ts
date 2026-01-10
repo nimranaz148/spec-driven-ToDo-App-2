@@ -64,6 +64,27 @@ export interface ChatMessage {
   content: string;
 }
 
+export interface Conversation {
+  id: number;
+  user_id: string;
+  title: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Message {
+  id: number;
+  conversation_id: number;
+  role: 'user' | 'assistant';
+  content: string;
+  tool_calls?: ToolCall[];
+  created_at: string;
+}
+
+export interface ConversationWithMessages extends Conversation {
+  messages?: Message[];
+}
+
 export interface ChatRequest {
   conversation_id?: number | null;
   message: string;

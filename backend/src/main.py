@@ -11,6 +11,7 @@ load_dotenv()
 
 from .db import create_tables, close_connection
 from .routes import tasks, chat, voice, conversations
+from .routes.chatkit import router as chatkit_router
 from .middleware import RateLimitMiddleware, RequestIDMiddleware, TimingMiddleware
 from .utils.logger import get_logger, configure_logging
 from .mcp_server import mcp_server
@@ -78,6 +79,7 @@ app.include_router(tasks.router)
 app.include_router(chat.router)
 app.include_router(voice.router)
 app.include_router(conversations.router)
+app.include_router(chatkit_router)  # ChatKit integration for OpenAI ChatKit React
 
 # NOTE: MCP server runs as a separate process on port 8001
 # Start it with: python -m src.mcp_server

@@ -1,5 +1,15 @@
 'use client';
 
+// Extend Window interface for Web Speech API
+declare global {
+  interface Window {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    SpeechRecognition: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    webkitSpeechRecognition: any;
+  }
+}
+
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -12,16 +22,11 @@ import {
   Volume2,
   VolumeX,
   Loader2,
-  Brain,
-  ChevronDown,
-  ChevronRight,
-  CheckCircle2,
-  Wrench,
   MessageSquarePlus,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/stores/auth-store';
-import { api, StreamEvent } from '@/lib/api';
+import { api } from '@/lib/api';
 
 interface VoiceMessage {
   id: string;
@@ -65,6 +70,7 @@ export default function VoicePage() {
   });
   
   const messageIdRef = useRef(0);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const recognitionRef = useRef<any>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -107,6 +113,7 @@ export default function VoicePage() {
       setTranscript('');
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     recognition.onresult = (event: any) => {
       const current = event.resultIndex;
       const transcriptText = event.results[current][0].transcript;
@@ -120,6 +127,7 @@ export default function VoicePage() {
       }
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     recognition.onerror = (event: any) => {
       console.error('Speech recognition error:', event.error);
       setIsListening(false);
@@ -241,9 +249,9 @@ export default function VoicePage() {
               <div className="mt-4 text-sm text-muted-foreground/70">
                 <p>Try saying:</p>
                 <ul className="mt-2 space-y-1">
-                  <li>"Show my tasks"</li>
-                  <li>"Add a task to buy groceries"</li>
-                  <li>"Mark task 1 as done"</li>
+                  <li>&quot;Show my tasks&quot;</li>
+                  <li>&quot;Add a task to buy groceries&quot;</li>
+                  <li>&quot;Mark task 1 as done&quot;</li>
                 </ul>
               </div>
             </div>
@@ -340,7 +348,7 @@ export default function VoicePage() {
           {/* Transcript */}
           {transcript && (
             <p className="mt-3 text-center text-sm text-muted-foreground italic">
-              "{transcript}"
+              &quot;{transcript}&quot;
             </p>
           )}
 

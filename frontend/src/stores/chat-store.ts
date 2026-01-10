@@ -310,6 +310,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
     }
 
     const conversationId = get().activeConversationId;
+    void conversationId; // May be used in future logic
 
     // Create optimistic user message (only if not a confirmation)
     const optimisticUserMessage: Message | null = confirmToken ? null : {
@@ -340,7 +341,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
       const response: ChatResponse = await api.sendChatMessage(
         userId,
         content.trim() || 'confirm',
-        activeConversationId,
+        get().activeConversationId,
         confirmToken
       );
 

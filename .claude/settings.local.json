@@ -113,7 +113,11 @@
       "WebFetch(domain:openai.github.io)",
       "Bash(.venv/bin/pip install:*)",
       "Bash(uv pip:*)",
-      "Bash(pip show:*)"
+      "Bash(pip show:*)",
+      "Bash(uv sync:*)",
+      "Bash(pip index:*)",
+      "Bash(pip search:*)",
+      "Bash(uv run python:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

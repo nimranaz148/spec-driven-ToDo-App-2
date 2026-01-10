@@ -87,6 +87,19 @@ export function DialogTitle({ children, className }: DialogTitleProps) {
   );
 }
 
+interface DialogDescriptionProps {
+  children: React.ReactNode;
+  className?: string;
+}
+
+export function DialogDescription({ children, className }: DialogDescriptionProps) {
+  return (
+    <p className={cn('text-sm text-muted-foreground', className)}>
+      {children}
+    </p>
+  );
+}
+
 interface DialogFooterProps {
   children: React.ReactNode;
   className?: string;

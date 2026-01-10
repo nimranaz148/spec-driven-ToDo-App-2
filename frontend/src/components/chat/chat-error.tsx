@@ -1,7 +1,7 @@
-"""Error handling components for chat UI."""
+// Error handling components for chat UI
 
 import React from 'react'
-import { AlertCircle, RefreshCw, Wifi, WifiOff } from 'lucide-react'
+import { AlertCircle, RefreshCw, WifiOff } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 

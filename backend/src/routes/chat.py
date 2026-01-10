@@ -24,6 +24,7 @@ from typing import Optional, AsyncGenerator
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 
 from ..db import get_session
 from ..auth import get_current_user, verify_user_access
@@ -31,7 +32,7 @@ from ..schemas.chat import (
     ChatRequest, ChatResponse, ToolCall,
     ThinkingStep, ThinkingStepType, ConfirmationRequest
 )
-from ..models import MessageRole
+from ..models import MessageRole, Conversation
 from ..services.conversation_service import (
     get_or_create_conversation,
     append_message,
@@ -218,6 +219,7 @@ async def send_chat_message(
 @router.get("/history", response_model=list[dict])
 async def get_chat_history(
     user_id: str,
+    conversation_id: int | None = None,
     current_user: dict = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ):
@@ -228,6 +230,7 @@ async def get_chat_history(
 
     Args:
         user_id: User ID from URL path
+        conversation_id: Optional conversation ID to filter messages
         current_user: Authenticated user from JWT
         session: Database session
 
@@ -239,10 +242,26 @@ async def get_chat_history(
     """
     verify_user_access(user_id, current_user)
 
-    logger.debug("chat_history_requested", user_id=user_id)
+    logger.debug("chat_history_requested", user_id=user_id, conversation_id=conversation_id)
 
-    # Get or create conversation (returns existing if present)
-    conversation = await get_or_create_conversation(session, user_id)
+    # Get conversation - either specific one or default
+    if conversation_id:
+        # Verify the conversation belongs to this user
+        result = await session.execute(
+            select(Conversation).where(
+                Conversation.id == conversation_id,
+                Conversation.user_id == user_id
+            )
+        )
+        conversation = result.scalar_one_or_none()
+        if not conversation:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Conversation not found"
+            )
+    else:
+        # Get or create default conversation
+        conversation = await get_or_create_conversation(session, user_id)
 
     # Get full history
     messages = await get_full_history(session, conversation.id, user_id)
@@ -375,8 +394,44 @@ async def stream_chat_message(
                 }
                 yield f"data: {json.dumps({'type': 'tool_call', 'data': tool_data})}\n\n"
 
-            # Stream response text in chunks
+            # Check if agent returned an error
             response_text = agent_response.response
+            if agent_response.error:
+                # Send as error event with detailed information
+                error_message = str(agent_response.error)
+                if 'quota' in error_message.lower() or 'rate limit' in error_message.lower() or '429' in error_message:
+                    error_data = {
+                        'type': 'error',
+                        'error_type': 'rate_limit',
+                        'message': error_message,
+                        'user_message': 'API rate limit exceeded. Please wait a moment and try again.'
+                    }
+                    yield f"data: {json.dumps(error_data)}\n\n"
+                else:
+                    error_data = {'type': 'error', 'message': error_message}
+                    yield f"data: {json.dumps(error_data)}\n\n"
+                
+                # Still save the error message to conversation history
+                await append_message(
+                    session,
+                    conversation,
+                    MessageRole.ASSISTANT,
+                    response_text
+                )
+                
+                # Send completion
+                done_data = {'type': 'done', 'processing_time_ms': agent_response.processing_time_ms}
+                yield f"data: {json.dumps(done_data)}\n\n"
+                
+                logger.info(
+                    "stream_chat_error_handled",
+                    user_id=user_id,
+                    conversation_id=conversation.id,
+                    error_type='rate_limit' if 'quota' in error_message.lower() else 'general'
+                )
+                return
+
+            # Stream response text in chunks
             logger.info(f"Streaming response text: '{response_text}' (length: {len(response_text)})")
             chunk_size = 10  # Characters per chunk
             for i in range(0, len(response_text), chunk_size):

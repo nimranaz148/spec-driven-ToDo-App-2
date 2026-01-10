@@ -16,9 +16,13 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
 
   useEffect(() => {
     // Wait for zustand to hydrate from localStorage
-    setHasHydrated(true);
+    // Using setTimeout to defer state update
+    const timer = setTimeout(() => {
+      setHasHydrated(true);
+    }, 0);
     // Sync token cookie for Edge runtime
     syncTokenCookie();
+    return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
