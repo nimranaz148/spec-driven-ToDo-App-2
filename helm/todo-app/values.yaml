@@ -1,0 +1,58 @@
+environment: local
+
+images:
+  frontend:
+    repository: frontend
+    tag: latest
+    pullPolicy: Never
+  backend:
+    repository: backend
+    tag: latest
+    pullPolicy: Never
+  mcp:
+    repository: mcp
+    tag: latest
+    pullPolicy: Never
+
+replicas:
+  frontend: 2
+  backend: 2
+  mcp: 1
+
+resources:
+  frontend:
+    limits:
+      memory: 256Mi
+      cpu: "0.5"
+    requests:
+      memory: 256Mi
+      cpu: "0.5"
+  backend:
+    limits:
+      memory: 512Mi
+      cpu: "1"
+    requests:
+      memory: 512Mi
+      cpu: "1"
+  mcp:
+    limits:
+      memory: 256Mi
+      cpu: "0.5"
+    requests:
+      memory: 256Mi
+      cpu: "0.5"
+
+ingress:
+  enabled: true
+  host: todo.local
+  ingressClassName: nginx
+
+config:
+  logLevel: info
+  nodeEnv: production
+
+secrets:
+  databaseUrl: ""
+  betterAuthSecret: "secure-random-string"
+  betterAuthUrl: "http://todo.local"
+  openaiApiKey: ""

@@ -1,0 +1,75 @@
+# Helm Values Schema Contract
+
+This file defines the configuration contract for the Todo App Helm Chart. This structure MUST be adhered to `values.yaml`.
+
+```yaml
+# Global configuration shared across subcharts
+global:
+  environment: "development" # development | staging | production
+
+# Frontend Component Configuration
+frontend:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: todo-frontend
+    pullPolicy: IfNotPresent
+    tag: "" # Overrides the image tag whose default is the chart appVersion.
+  service:
+    type: ClusterIP
+    port: 3000
+    targetPort: 3000
+  ingress:
+    enabled: true
+    host: "todo.local"
+  resources:
+    limits:
+      cpu: 500m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+# Backend Component Configuration
+backend:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: todo-backend
+    pullPolicy: IfNotPresent
+    tag: ""
+  service:
+    type: ClusterIP
+    port: 8000
+    targetPort: 8000
+  env:
+    # DATABASE_URL and OPENAI_API_KEY should be passed as secrets, not here
+    LOG_LEVEL: "info"
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 512Mi
+    requests:
+      cpu: 200m
+      memory: 256Mi
+
+# MCP Server Component Configuration
+mcp:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: todo-mcp-server
+    pullPolicy: IfNotPresent
+    tag: ""
+  service:
+    type: ClusterIP
+    port: 8001
+    targetPort: 8001
+  resources:
+    limits:
+      cpu: 500m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+```

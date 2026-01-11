@@ -53,13 +53,25 @@ trap cleanup SIGINT SIGTERM
 # Start backend
 echo -e "${BLUE}🔧 Starting Backend (FastAPI on port 8000)...${NC}"
 cd "$BACKEND_DIR"
-py -m uvicorn src.main:app --reload --port 8000 --host 0.0.0.0 > ../backend.log 2>&1 &
+uv run uvicorn src.main:app --reload --port 8000 > ../backend.log 2>&1 &
 BACKEND_PID=$!
 echo "   Backend PID: $BACKEND_PID"
 echo "   Logs: tail -f backend.log"
 echo ""
 
 # Wait a bit for backend to start
+sleep 2
+
+# Start MCP server
+echo -e "${YELLOW}🤖 Starting MCP Server (AI tools)...${NC}"
+cd "$BACKEND_DIR"
+uv run python -m src.mcp_server > ../mcp.log 2>&1 &
+MCP_PID=$!
+echo "   MCP Server PID: $MCP_PID"
+echo "   Logs: tail -f mcp.log"
+echo ""
+
+# Wait a bit for MCP to start
 sleep 2
 
 # Start frontend
@@ -79,10 +91,12 @@ echo ""
 echo "📍 Frontend:   http://localhost:3000"
 echo "📍 Backend:    http://localhost:8000"
 echo "📍 API Docs:   http://localhost:8000/docs"
+echo "📍 MCP Server: Running for AI chat"
 echo ""
 echo "📋 View logs:"
-echo "   Backend:  tail -f backend.log"
-echo "   Frontend: tail -f frontend.log"
+echo "   Backend:    tail -f backend.log"
+echo "   MCP Server: tail -f mcp.log"
+echo "   Frontend:   tail -f frontend.log"
 echo ""
 echo "Press Ctrl+C to stop all servers"
 echo ""

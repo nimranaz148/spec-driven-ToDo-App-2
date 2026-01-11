@@ -1,0 +1,7 @@
+images:
+  frontend:
+    pullPolicy: Never
+  backend:
+    pullPolicy: Never
+  mcp:
+    pullPolicy: Never

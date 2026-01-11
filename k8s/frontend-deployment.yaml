@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: todo-app
+  labels:
+    app: todo-chatbot
+    component: frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: todo-chatbot
+      component: frontend
+  template:
+    metadata:
+      labels:
+        app: todo-chatbot
+        component: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: frontend:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 3000
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "0.5"
+            limits:
+              memory: "256Mi"
+              cpu: "0.5"
+          livenessProbe:
+            httpGet:
+              path: /_next/health
+              port: 3000
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /_next/health
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          env:
+            - name: NEXT_PUBLIC_BACKEND_URL
+              value: "http://todo.local/api"
+            - name: BETTER_AUTH_URL
+              value: "http://todo.local"
+          envFrom:
+            - secretRef:
+                name: todo-secrets

@@ -62,3 +62,11 @@ backend/requirements.txt
 frontend/.env.local
 nul
 frontend/nul
+
+# Kubernetes
+k8s/secrets.yaml
+
+# Helm
+helm/*.tgz
+helm/todo-app/charts/
+
