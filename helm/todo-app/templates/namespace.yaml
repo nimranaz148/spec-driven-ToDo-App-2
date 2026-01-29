@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ .Release.Namespace }}
+  labels:
+    name: {{ .Release.Namespace }}
+    environment: {{ .Values.environment }}
+    {{- include "todo-app.labels" . | nindent 4 }}

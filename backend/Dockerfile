@@ -2,9 +2,10 @@
 FROM python:3.11-slim AS builder
 WORKDIR /app
 COPY pyproject.toml ./
+COPY README.md ./
 RUN pip install --no-cache-dir -e .
 COPY src/ ./src/
-COPY alembic/ ./alembic/
+COPY migrations/ ./migrations/
 COPY alembic.ini ./
 
 # Stage 2: Runtime

@@ -14,7 +14,7 @@ RUN npm run build
 
 # Stage 3: Runtime
 FROM node:20-alpine
-RUN adduser -D -u 1000 appuser
+RUN adduser -D appuser
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=builder /app/.next ./.next

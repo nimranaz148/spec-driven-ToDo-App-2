@@ -1,7 +1,9 @@
+# Build from repository root with: docker build -f mcp/Dockerfile -t mcp:latest .
 # Stage 1: Builder
 FROM python:3.11-slim AS builder
 WORKDIR /app
 COPY backend/pyproject.toml ./
+COPY backend/README.md ./
 RUN pip install --no-cache-dir -e .
 COPY backend/src/ ./src/
 

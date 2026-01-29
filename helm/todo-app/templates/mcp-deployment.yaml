@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mcp
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: todo-chatbot
+    component: mcp
+    {{- include "todo-app.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicas.mcp }}
+  selector:
+    matchLabels:
+      app: todo-chatbot
+      component: mcp
+      {{- include "todo-app.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app: todo-chatbot
+        component: mcp
+        {{- include "todo-app.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: mcp
+          image: "{{ .Values.images.mcp.repository }}:{{ .Values.images.mcp.tag }}"
+          imagePullPolicy: {{ .Values.images.mcp.pullPolicy }}
+          ports:
+            - containerPort: 8001
+          resources:
+            {{- toYaml .Values.resources.mcp | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8001
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8001
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          envFrom:
+            - configMapRef:
+                name: todo-config
+            - secretRef:
+                name: todo-secrets

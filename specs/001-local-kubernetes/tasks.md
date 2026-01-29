@@ -74,7 +74,7 @@ This document breaks down the implementation of Phase 4 Local Kubernetes Deploym
 ### Validation & Documentation
 
 - [x] T025 [US1] Create docker-compose.yml for local testing with all three services
-- [ ] T026 [US1] Test image builds with eval $(minikube docker-env) and verify sizes meet SC-003
+- [x] T026 [US1] Test image builds with eval $(minikube docker-env) and verify sizes meet SC-003
 - [x] T027 [US1] Document build instructions in specs/001-local-kubernetes/quickstart.md
 
 **Acceptance**:
@@ -110,9 +110,9 @@ This document breaks down the implementation of Phase 4 Local Kubernetes Deploym
 ### Deployment & Validation
 
 - [x] T036 [US2] Create deployment script scripts/deploy-backend.sh (build images, apply manifests)
-- [ ] T037 [US2] Test Backend deployment: verify pods Running, check logs for successful DB connection
-- [ ] T038 [US2] Test Backend health endpoint: kubectl port-forward and curl http://localhost:8000/health
-- [ ] T039 [US2] Test Backend -> MCP connectivity: kubectl exec into backend pod, curl http://mcp-server:8001/health
+- [x] T037 [US2] Test Backend deployment: verify pods Running, check logs for successful DB connection
+- [x] T038 [US2] Test Backend health endpoint: kubectl port-forward and curl http://localhost:8000/health
+- [x] T039 [US2] Test Backend -> MCP connectivity: kubectl exec into backend pod, curl http://mcp-server:8001/health
 
 **Acceptance**:
 
@@ -132,24 +132,24 @@ This document breaks down the implementation of Phase 4 Local Kubernetes Deploym
 
 ### Frontend Kubernetes Resources
 
-- [ ] T040 [P] [US3] Create k8s/frontend-deployment.yaml with 2 replicas, resource limits (256Mi/0.5 CPU)
-- [ ] T041 [P] [US3] Add liveness/readiness probes to frontend-deployment.yaml (HTTP GET /\_next/health on port 3000)
-- [ ] T042 [P] [US3] Configure frontend-deployment.yaml with NEXT_PUBLIC_BACKEND_URL environment variable
-- [ ] T043 [P] [US3] Create k8s/frontend-service.yaml as ClusterIP on port 3000
+- [x] T040 [P] [US3] Create k8s/frontend-deployment.yaml with 2 replicas, resource limits (256Mi/0.5 CPU)
+- [x] T041 [P] [US3] Add liveness/readiness probes to frontend-deployment.yaml (HTTP GET /\_next/health on port 3000)
+- [x] T042 [P] [US3] Configure frontend-deployment.yaml with NEXT_PUBLIC_BACKEND_URL environment variable
+- [x] T043 [P] [US3] Create k8s/frontend-service.yaml as ClusterIP on port 3000
 
 ### Ingress Configuration
 
-- [ ] T044 [US3] Create k8s/ingress.yaml with NGINX ingressClassName and host todo.local
-- [ ] T045 [US3] Configure ingress.yaml with two paths: / → frontend-service:3000, /api → backend-service:8000
-- [ ] T046 [US3] Add NGINX Ingress Controller enable step to deployment script (minikube addons enable ingress)
-- [ ] T047 [US3] Add /etc/hosts entry instructions to quickstart.md (127.0.0.1 todo.local or minikube ip)
+- [x] T044 [US3] Create k8s/ingress.yaml with NGINX ingressClassName and host todo.local
+- [x] T045 [US3] Configure ingress.yaml with two paths: / → frontend-service:3000, /api → backend-service:8000
+- [x] T046 [US3] Add NGINX Ingress Controller enable step to deployment script (minikube addons enable ingress)
+- [x] T047 [US3] Add /etc/hosts entry instructions to quickstart.md (127.0.0.1 todo.local or minikube ip)
 
 ### Deployment & Validation
 
-- [ ] T048 [US3] Update deployment script to include Frontend resources
-- [ ] T049 [US3] Test Frontend deployment: verify pods Running with 2 replicas
-- [ ] T050 [US3] Test Ingress: curl http://todo.local should return HTML (SC-004)
-- [ ] T051 [US3] Test end-to-end flow: open http://todo.local in browser, login, create a task, verify in DB
+- [x] T048 [US3] Update deployment script to include Frontend resources
+- [x] T049 [US3] Test Frontend deployment: verify pods Running with 2 replicas
+- [x] T050 [US3] Test Ingress: curl http://todo.local should return HTML (SC-004)
+- [x] T051 [US3] Test end-to-end flow: open http://todo.local in browser, login, create a task, verify in DB
 
 **Acceptance**:
 
@@ -169,32 +169,32 @@ This document breaks down the implementation of Phase 4 Local Kubernetes Deploym
 
 ### Helm Chart Creation
 
-- [ ] T052 [P] [US4] Create helm/todo-app/Chart.yaml with chart metadata (name, version 0.1.0, apiVersion v2)
-- [ ] T053 [P] [US4] Create helm/todo-app/values.yaml with all configurable parameters (replicas, resources, images, ingress)
-- [ ] T054 [P] [US4] Create helm/todo-app/values-dev.yaml with dev-specific overrides (imagePullPolicy: Never)
-- [ ] T055 [P] [US4] Create helm/todo-app/templates/\_helpers.tpl with label and name helpers
+- [x] T052 [P] [US4] Create helm/todo-app/Chart.yaml with chart metadata (name, version 0.1.0, apiVersion v2)
+- [x] T053 [P] [US4] Create helm/todo-app/values.yaml with all configurable parameters (replicas, resources, images, ingress)
+- [x] T054 [P] [US4] Create helm/todo-app/values-dev.yaml with dev-specific overrides (imagePullPolicy: Never)
+- [x] T055 [P] [US4] Create helm/todo-app/templates/\_helpers.tpl with label and name helpers
 
 ### Helm Templates
 
-- [ ] T056 [P] [US4] Convert k8s/namespace.yaml to helm/todo-app/templates/namespace.yaml with values templating
-- [ ] T057 [P] [US4] Convert k8s/configmap.yaml to helm/todo-app/templates/configmap.yaml with values templating
-- [ ] T058 [P] [US4] Convert k8s/secrets.yaml.template to helm/todo-app/templates/secrets.yaml with values templating
-- [ ] T059 [P] [US4] Convert k8s/backend-deployment.yaml to helm/todo-app/templates/backend-deployment.yaml with values templating
-- [ ] T060 [P] [US4] Convert k8s/backend-service.yaml to helm/todo-app/templates/backend-service.yaml with values templating
-- [ ] T061 [P] [US4] Convert k8s/mcp-deployment.yaml to helm/todo-app/templates/mcp-deployment.yaml with values templating
-- [ ] T062 [P] [US4] Convert k8s/mcp-service.yaml to helm/todo-app/templates/mcp-service.yaml with values templating
-- [ ] T063 [P] [US4] Convert k8s/frontend-deployment.yaml to helm/todo-app/templates/frontend-deployment.yaml with values templating
-- [ ] T064 [P] [US4] Convert k8s/frontend-service.yaml to helm/todo-app/templates/frontend-service.yaml with values templating
-- [ ] T065 [P] [US4] Convert k8s/ingress.yaml to helm/todo-app/templates/ingress.yaml with values templating
+- [x] T056 [P] [US4] Convert k8s/namespace.yaml to helm/todo-app/templates/namespace.yaml with values templating
+- [x] T057 [P] [US4] Convert k8s/configmap.yaml to helm/todo-app/templates/configmap.yaml with values templating
+- [x] T058 [P] [US4] Convert k8s/secrets.yaml.template to helm/todo-app/templates/secrets.yaml with values templating
+- [x] T059 [P] [US4] Convert k8s/backend-deployment.yaml to helm/todo-app/templates/backend-deployment.yaml with values templating
+- [x] T060 [P] [US4] Convert k8s/backend-service.yaml to helm/todo-app/templates/backend-service.yaml with values templating
+- [x] T061 [P] [US4] Convert k8s/mcp-deployment.yaml to helm/todo-app/templates/mcp-deployment.yaml with values templating
+- [x] T062 [P] [US4] Convert k8s/mcp-service.yaml to helm/todo-app/templates/mcp-service.yaml with values templating
+- [x] T063 [P] [US4] Convert k8s/frontend-deployment.yaml to helm/todo-app/templates/frontend-deployment.yaml with values templating
+- [x] T064 [P] [US4] Convert k8s/frontend-service.yaml to helm/todo-app/templates/frontend-service.yaml with values templating
+- [x] T065 [P] [US4] Convert k8s/ingress.yaml to helm/todo-app/templates/ingress.yaml with values templating
 
 ### Validation & Documentation
 
-- [ ] T066 [US4] Run helm lint ./helm/todo-app and fix any errors (SC-005)
-- [ ] T067 [US4] Create helm/todo-app/README.md with installation instructions and value descriptions
-- [ ] T068 [US4] Test Helm deployment: helm install todo-app ./helm/todo-app --set secrets.databaseUrl=$DATABASE_URL
-- [ ] T069 [US4] Verify Helm deployment matches manual deployment (all pods Running, services accessible)
-- [ ] T070 [US4] Document kubectl-ai usage examples in specs/001-local-kubernetes/quickstart.md
-- [ ] T071 [US4] Document kagent setup and usage in specs/001-local-kubernetes/quickstart.md
+- [x] T066 [US4] Run helm lint ./helm/todo-app and fix any errors (SC-005)
+- [x] T067 [US4] Create helm/todo-app/README.md with installation instructions and value descriptions
+- [x] T068 [US4] Test Helm deployment: helm install todo-app ./helm/todo-app --set secrets.databaseUrl=$DATABASE_URL
+- [x] T069 [US4] Verify Helm deployment matches manual deployment (all pods Running, services accessible)
+- [x] T070 [US4] Document kubectl-ai usage examples in specs/001-local-kubernetes/quickstart.md
+- [x] T071 [US4] Document kagent setup and usage in specs/001-local-kubernetes/quickstart.md
 
 **Acceptance**:
 
@@ -210,14 +210,14 @@ This document breaks down the implementation of Phase 4 Local Kubernetes Deploym
 
 **Goal**: Finalize documentation, add validation scripts, ensure all success criteria met
 
-- [ ] T072 Create scripts/validate-deployment.sh to check all pods Running, services ready, ingress accessible
-- [ ] T073 Add deployment timing measurements to validate SC-001 (<5 minute deployment)
-- [ ] T074 Create scripts/teardown.sh to clean up Minikube resources (kubectl delete namespace todo-app)
-- [ ] T075 Update root README.md with Phase 4 deployment instructions and links to quickstart
-- [ ] T076 Add troubleshooting section to specs/001-local-kubernetes/quickstart.md (common issues, solutions)
-- [ ] T077 Create Makefile with targets: build-images, deploy-k8s, deploy-helm, validate, teardown
-- [ ] T078 Run full validation: measure deployment time, verify image sizes, check pod stability (5 min, 0 restarts)
-- [ ] T079 Document Gordon (Docker Desktop AI) usage for Dockerfile optimization in specs/001-local-kubernetes/quickstart.md
+- [x] T072 Create scripts/validate-deployment.sh to check all pods Running, services ready, ingress accessible
+- [x] T073 Add deployment timing measurements to validate SC-001 (<5 minute deployment)
+- [x] T074 Create scripts/teardown.sh to clean up Minikube resources (kubectl delete namespace todo-app)
+- [x] T075 Update root README.md with Phase 4 deployment instructions and links to quickstart
+- [x] T076 Add troubleshooting section to specs/001-local-kubernetes/quickstart.md (common issues, solutions)
+- [x] T077 Create Makefile with targets: build-images, deploy-k8s, deploy-helm, validate, teardown
+- [x] T078 Run full validation: measure deployment time, verify image sizes, check pod stability (5 min, 0 restarts)
+- [x] T079 Document Gordon (Docker Desktop AI) usage for Dockerfile optimization in specs/001-local-kubernetes/quickstart.md
 
 **Acceptance**:
 
@@ -308,16 +308,16 @@ Setup → Foundational → US1 Dockerfiles → US1 Validation → US2 Backend De
 
 After completing all tasks:
 
-- [ ] All Functional Requirements (FR-001 through FR-012) satisfied
-- [ ] All Success Criteria (SC-001 through SC-005) validated
-- [ ] All User Stories have independent tests passing
-- [ ] Documentation is complete and accurate
-- [ ] No secrets committed to git
-- [ ] All images optimized and meet size constraints
-- [ ] Deployment scripts work end-to-end
-- [ ] Helm chart validates with helm lint
-- [ ] Application is fully functional via http://todo.local
-- [ ] Operational tooling (kubectl-ai, kagent) documented
+- [x] All Functional Requirements (FR-001 through FR-012) satisfied
+- [x] All Success Criteria (SC-001 through SC-005) validated
+- [x] All User Stories have independent tests passing
+- [x] Documentation is complete and accurate
+- [x] No secrets committed to git
+- [x] All images optimized and meet size constraints
+- [x] Deployment scripts work end-to-end
+- [x] Helm chart validates with helm lint
+- [x] Application is fully functional via http://todo.local
+- [x] Operational tooling (kubectl-ai, kagent) documented
 
 ---
 

@@ -2,7 +2,7 @@
 name = "whisperdo-backend"
 version = "1.0.0"
 description = "WhisperDo - AI-Powered Task Management Backend with FastAPI and SQLModel"
-requires-python = ">=3.13"
+requires-python = ">=3.11"
 readme = "README.md"
 license = {text = "MIT"}
 
