@@ -6,8 +6,7 @@ import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { authClient } from '@/lib/auth-client';
-import { generateAndStoreJwtToken } from '@/lib/auth-client';
+import { authClient, generateAndStoreJwtToken } from '@/lib/simple-auth';
 import { useAuthStore } from '@/stores/auth-store';
 import { cn } from '@/lib/utils';
 

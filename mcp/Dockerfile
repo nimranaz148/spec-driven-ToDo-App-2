@@ -11,7 +11,12 @@ COPY backend/src/ ./src/
 FROM python:3.11-slim
 RUN useradd -m -u 1000 appuser
 WORKDIR /app
+
+# Copy installed packages from builder
+COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+COPY --from=builder /usr/local/bin /usr/local/bin
 COPY --from=builder /app ./
+
 USER appuser
 EXPOSE 8001
 CMD ["python", "-m", "src.mcp_server"]
